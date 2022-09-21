@@ -14,16 +14,17 @@ class SVMParameters {
 public:
     SVMParameters(const svm_model *, const svm_problem &, bool margin=false);
     
-    double computeLeftHand(svm_node *, double);
+    double computeLeftHand(const svm_node *, double);
     void print();
     
 private:
     const svm_model *model;
-    int N, d, lenSV0, lenSV1;
+    int l, N, d, lenSV0, lenSV1;
     svm_node **X, **XSV0, **XSV1, *XSV;
     double *y, *alpha, sumB, ysv, margin;
 
-    double kernel(svm_node *, svm_node *);
+    double kernel(const svm_node *, const svm_node *);
+    
     void computeB();
     void computeMargin();
     void separateVS();

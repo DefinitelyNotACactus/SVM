@@ -13,13 +13,42 @@ struct svm_node
 {
     int index;
     double value;
+    
+    svm_node(const svm_node &node) : index(node.index), value(node.value){ };
+    svm_node() : svm_node(-1, 0.0) { };
+    svm_node(int index, double value) : index(index), value(value) { };
 };
 
 struct svm_problem
 {
-    int l, d;
+    int maxl, l, d;
     double *y;
     struct svm_node **x;
+    
+    svm_problem() { };
+    svm_problem(const svm_problem &problem) : svm_problem(problem.maxl, problem.l, problem.d) {
+        for(int i = 0; i < l; i++) {
+            y[i] = problem.y[i];
+            x[i] = new svm_node[d + 1];
+            for(int j = 0; j <= d; j++) {
+                x[i][j] = problem.x[i][j];
+            }
+        }
+    }
+    svm_problem(int l, int d) : maxl(l), l(l), d(d), y(new double[maxl]), x(new svm_node*[maxl]) { };
+    svm_problem(int maxl, int l, int d) : maxl(maxl), l(l), d(d), y(new double[maxl]), x(new svm_node*[maxl]) { };
+
+    void append(svm_node *xn, double yn) {
+        if(l == maxl) {
+            // TODO: Increase svm_problem size when l == maxl
+        }
+        y[l] = yn;
+        x[l] = new svm_node[d + 1];
+        for(int i = 0; i <= d; i++) {
+            x[l][i] = xn[i];
+        }
+        l++;
+    }
 };
 
 enum { C_SVC, NU_SVC, ONE_CLASS, EPSILON_SVR, NU_SVR };    /* svm_type */

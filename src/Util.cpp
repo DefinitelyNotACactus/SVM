@@ -8,6 +8,10 @@
 #include "Util.hpp"
 
 #include <math.h>
+#include <random>
+
+std::random_device rd = std::random_device{};
+std::default_random_engine rng = std::default_random_engine{ rd() };
 
 double dot(const int size, const svm_node *xn, const svm_node *xm) {
     double product = 0;
@@ -39,4 +43,27 @@ double *diff(const int size, const svm_node *xn, const svm_node *xm) {
         diff[i] = xn[i].value - xm[i].value;
     }
     return diff;
+}
+
+double accuracyScore(const int size, const double *h, const double *y) {
+    int rightPredictions = 0;
+    for(int i = 0; i < size; i++) {
+        if(h[i] == y[i]) {
+            rightPredictions += 1;
+        }
+    }
+    return (double) rightPredictions / (double) size;
+}
+
+std::vector<int> randomChoice(const int range, const int samples) {
+    if(samples <= 0) {
+        return std::vector<int>();
+    }
+    std::vector<int> v(range);
+    std::iota(v.begin(), v.end(), 0);
+    if (samples > range) {
+        return v;
+    }
+    std::shuffle(v.begin(), v.end(), rng);
+    return std::vector<int>(v.begin(), v.begin() + samples);
 }

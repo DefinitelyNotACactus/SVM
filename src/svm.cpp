@@ -2093,9 +2093,9 @@ static void svm_group_classes(const svm_problem *prob, int *nr_class_ret, int **
     int l = prob->l;
     int max_nr_class = 16;
     int nr_class = 0;
-    int *label = Malloc(int,max_nr_class);
-    int *count = Malloc(int,max_nr_class);
-    int *data_label = Malloc(int,l);
+    int *label = new int[max_nr_class];
+    int *count = new int[max_nr_class];
+    int *data_label = new int[l];
     int i;
 
     for(i=0;i<l;i++)
@@ -2160,7 +2160,7 @@ static void svm_group_classes(const svm_problem *prob, int *nr_class_ret, int **
     *label_ret = label;
     *start_ret = start;
     *count_ret = count;
-    free(data_label);
+    delete [] data_label;
 }
 
 //
@@ -2185,7 +2185,7 @@ svm_model *svm_train(const svm_problem *prob, const svm_parameter *param)
         model->sv_coef = Malloc(double *,1);
 
         decision_function f = svm_train_one(prob,param,0,0);
-        model->rho = Malloc(double,1);
+        model->rho = new double[1];
         model->rho[0] = f.rho;
 
         int nSV = 0;
@@ -2236,7 +2236,7 @@ svm_model *svm_train(const svm_problem *prob, const svm_parameter *param)
         int *label = NULL;
         int *start = NULL;
         int *count = NULL;
-        int *perm = Malloc(int,l);
+        int *perm = new int[l];
 
         // group training data of the same class
         svm_group_classes(prob,&nr_class,&label,&start,&count,perm);
@@ -2245,12 +2245,16 @@ svm_model *svm_train(const svm_problem *prob, const svm_parameter *param)
 
         svm_node **x = Malloc(svm_node *,l);
         int i;
-        for(i=0;i<l;i++)
-            x[i] = prob->x[perm[i]];
+        for(i=0;i<l;i++) {
+            x[i] = new svm_node[prob->d + 1];
+            for(int j = 0; j <= prob->d; j++) {
+                x[i][j] = prob->x[perm[i]][j];
+            }
+        }
 
         // calculate weighted C
 
-        double *weighted_C = Malloc(double, nr_class);
+        double *weighted_C = new double [nr_class];
         for(i=0;i<nr_class;i++)
             weighted_C[i] = param->C;
         for(i=0;i<param->nr_weight;i++)
@@ -2267,7 +2271,7 @@ svm_model *svm_train(const svm_problem *prob, const svm_parameter *param)
 
         // train k*(k-1)/2 models
 
-        bool *nonzero = Malloc(bool,l);
+        bool *nonzero = new bool[l];
         for(i=0;i<l;i++)
             nonzero[i] = false;
         decision_function *f = Malloc(decision_function,nr_class*(nr_class-1)/2);
@@ -2287,8 +2291,8 @@ svm_model *svm_train(const svm_problem *prob, const svm_parameter *param)
                 int si = start[i], sj = start[j];
                 int ci = count[i], cj = count[j];
                 sub_prob.l = ci+cj;
-                sub_prob.x = Malloc(svm_node *,sub_prob.l);
-                sub_prob.y = Malloc(double,sub_prob.l);
+                sub_prob.x = new svm_node *[sub_prob.l];
+                sub_prob.y = new double[sub_prob.l];
                 int k;
                 for(k=0;k<ci;k++)
                 {
@@ -2311,8 +2315,8 @@ svm_model *svm_train(const svm_problem *prob, const svm_parameter *param)
                 for(k=0;k<cj;k++)
                     if(!nonzero[sj+k] && fabs(f[p].alpha[ci+k]) > 0)
                         nonzero[sj+k] = true;
-                free(sub_prob.x);
-                free(sub_prob.y);
+                delete [] sub_prob.x;
+                delete [] sub_prob.y;
                 ++p;
             }
 
@@ -2364,8 +2368,8 @@ svm_model *svm_train(const svm_problem *prob, const svm_parameter *param)
         info("Total nSV = %d\n",total_sv);
 
         model->l = total_sv;
-        model->SV = Malloc(svm_node *,total_sv);
-        model->sv_indices = Malloc(int,total_sv);
+        model->SV = new svm_node *[total_sv];
+        model->sv_indices = new int[total_sv];
         p = 0;
         for(i=0;i<l;i++)
             if(nonzero[i])
@@ -2374,14 +2378,14 @@ svm_model *svm_train(const svm_problem *prob, const svm_parameter *param)
                 model->sv_indices[p++] = perm[i] + 1;
             }
 
-        int *nz_start = Malloc(int,nr_class);
+        int *nz_start = new int[nr_class];
         nz_start[0] = 0;
         for(i=1;i<nr_class;i++)
             nz_start[i] = nz_start[i-1]+nz_count[i-1];
 
-        model->sv_coef = Malloc(double *,nr_class-1);
+        model->sv_coef = new double *[nr_class-1];
         for(i=0;i<nr_class-1;i++)
-            model->sv_coef[i] = Malloc(double,total_sv);
+            model->sv_coef[i] = new double[total_sv];
 
         p = 0;
         for(i=0;i<nr_class;i++)
@@ -2414,9 +2418,9 @@ svm_model *svm_train(const svm_problem *prob, const svm_parameter *param)
         free(count);
         free(perm);
         free(start);
-        free(x);
+        delete [] x;
         free(weighted_C);
-        free(nonzero);
+        delete [] nonzero;
         for(i=0;i<nr_class*(nr_class-1)/2;i++)
             free(f[i].alpha);
         free(f);
@@ -2613,16 +2617,16 @@ double svm_predict_values(const svm_model *model, const svm_node *x, double* dec
         int nr_class = model->nr_class;
         int l = model->l;
 
-        double *kvalue = Malloc(double,l);
+        double *kvalue = new double[l];
         for(i=0;i<l;i++)
             kvalue[i] = Kernel::k_function(x,model->SV[i],model->param);
 
-        int *start = Malloc(int,nr_class);
+        int *start = new int[nr_class];
         start[0] = 0;
         for(i=1;i<nr_class;i++)
             start[i] = start[i-1]+model->nSV[i-1];
 
-        int *vote = Malloc(int,nr_class);
+        int *vote = new int[nr_class];
         for(i=0;i<nr_class;i++)
             vote[i] = 0;
 
@@ -2658,9 +2662,10 @@ double svm_predict_values(const svm_model *model, const svm_node *x, double* dec
             if(vote[i] > vote[vote_max_idx])
                 vote_max_idx = i;
 
-        free(kvalue);
-        free(start);
-        free(vote);
+        delete [] kvalue;
+        delete [] start;
+        delete [] vote;
+        
         return model->label[vote_max_idx];
     }
 }
@@ -2672,11 +2677,11 @@ double svm_predict(const svm_model *model, const svm_node *x)
     if(model->param.svm_type == ONE_CLASS ||
        model->param.svm_type == EPSILON_SVR ||
        model->param.svm_type == NU_SVR)
-        dec_values = Malloc(double, 1);
+        dec_values = new double[1];
     else
-        dec_values = Malloc(double, nr_class*(nr_class-1)/2);
+        dec_values = new double[nr_class*(nr_class-1)/2];
     double pred_result = svm_predict_values(model, x, dec_values);
-    free(dec_values);
+    delete [] dec_values;
     return pred_result;
 }
 
