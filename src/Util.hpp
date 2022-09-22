@@ -22,6 +22,9 @@ double norm(const int, const double *);
 double *diff(const int, const svm_node *, const svm_node *);
 
 double accuracyScore(const int, const double *, const double *);
+double **confusionMatrix(const int, const double*, const double*);
+
+void classificationReport(const int, const double *, const double *);
 
 std::vector<int> randomChoice(const int, const int);
 #endif /* Util_hpp */

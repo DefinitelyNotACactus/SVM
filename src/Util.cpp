@@ -9,6 +9,7 @@
 
 #include <math.h>
 #include <random>
+#include <iostream>
 
 std::random_device rd = std::random_device{};
 std::default_random_engine rng = std::default_random_engine{ rd() };
@@ -53,6 +54,52 @@ double accuracyScore(const int size, const double *h, const double *y) {
         }
     }
     return (double) rightPredictions / (double) size;
+}
+
+/**
+ Binary classification confusion matrix
+ @return A matrix with format [[trueNegative, falsePositive], [falseNegative, trueNegative]]
+ */
+double **confusionMatrix(const int size, const double *h, const double *y) {
+    // Matrix initialization
+    double **matrix = new double*[2];
+    for(int i = 0; i < 2; i++) {
+        matrix[i] = new double[2];
+        for(int j = 0; j < 2; j++) {
+            matrix[i][j] = 0;
+        }
+    }
+    // Fill the matrix
+    for(int i = 0; i < size; i++) {
+        if(h[i] == y[i]) {
+            if(y[i] == 1) {
+                matrix[1][1]++;
+            } else {
+                matrix[0][0]++;
+            }
+        } else {
+            if(y[i] == 1) {
+                matrix[0][1]++;
+            } else {
+                matrix[1][0]++;
+            }
+        }
+    }
+    
+    return matrix;
+}
+
+void classificationReport(const int size, const double *h, const double *y) {
+    double **matrix = confusionMatrix(size, h, y);
+    std::cout << "Class | Precision | Recall | F1-Score | Support\n";
+    std::cout << "Class 0 | " << matrix[0][0] / (matrix[0][0] + matrix[0][1]) << " | " << matrix[0][0] / (matrix[0][0] + matrix[1][0]) << " | N/A | " << matrix[0][0] + matrix[0][1] << "\n";
+    std::cout << "Class 1 | " << matrix[1][1] / (matrix[1][1] + matrix[1][0]) << " | " << matrix[1][1] / (matrix[1][1] + matrix[0][1]) << " | N/A | " << matrix[1][1] + matrix[1][0] << "\n";
+    std::cout << "Accuracy: " << (matrix[0][0] + matrix[1][1]) / (double) size << "\n";
+    // Free the confusion matrix
+    for(int i = 0; i < 2; i++) {
+        delete [] matrix[i];
+    }
+    delete [] matrix;
 }
 
 std::vector<int> randomChoice(const int range, const int samples) {

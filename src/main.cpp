@@ -13,13 +13,14 @@
 #include "DatasetReader.hpp"
 #include "SVMParameters.hpp"
 #include "SVMBatch.hpp"
+#include "Util.hpp"
 
 svm_problem problem;
 svm_parameter param;
 
 int main(int argc, const char * argv[]) {
-    DataFrame df = readCsv("datasets/titanic-processed.csv");
-    std::string target = "Survived";
+    DataFrame df = readCsv("datasets/heart-processed.csv");
+    std::string target = "HeartDisease";
     // Params
     param.svm_type = C_SVC;
     param.kernel_type = RBF;
@@ -52,7 +53,7 @@ int main(int argc, const char * argv[]) {
             problem.x[row][backIndex] = svm_node(column, df[df.columns[column]][row]);
             backIndex++;
         }
-        problem.x[row][backIndex] = svm_node();
+        problem.x[row][backIndex] = svm_node(-1, row);
     }
     // Train
     svm_model *model = svm_train(&problem, &param);
@@ -65,16 +66,17 @@ int main(int argc, const char * argv[]) {
     for(int i = 0; i < problem.l; i++) {
         double predictBatch = batchModel.predict(problem.x[i]), predictVanilla = batchModel.predict(model, problem.x[i]);
         if(predictBatch != problem.y[i]) {
+//            std::cout << "X[" << i << "] h(X[i]) = " << predictBatch << " f(X[i]) = " << problem.y[i] << "\n";
             wrongPredictionsBatch++;
         }
         if(predictVanilla != problem.y[i]) {
             wrongPredictionsVanilla++;
         }
     }
-    std::cout << "Accuracy Batch: " << 1 - ((double) wrongPredictionsBatch / (double) df.size) << "\n";
-    std::cout << "Accuracy Vanilla: " << 1 - ((double) wrongPredictionsVanilla / (double) df.size) << "\n";
-
-    delete model;
+    std::cout << "Vanilla:\n";
+    classificationReport(problem.l, batchModel.predict(model, problem), problem.y);
+    std::cout << "Batch:\n";
+    classificationReport(problem.l, batchModel.predict(problem), problem.y);
     
     return 0;
 }
