@@ -22,64 +22,83 @@ void SVMBatch::fit(const svm_problem &problem) {
         S.append(problem.x[sample], problem.y[sample]);
     }
     // Create U
-    svm_problem U(problem.l - S.l, problem.d);
+    svm_problem U(problem.l - S.l, problem.d), Ut(problem.l - S.l, problem.d);
     std::unordered_set<int> sampleSet(initialSample.begin(), initialSample.end());
     for(int row = 0, backIndex = 0; row < problem.l; row++) {
-        if(sampleSet.find(row) != sampleSet.end()) { continue; }
+        if(sampleSet.find(row) != sampleSet.end()) {
+            continue;
+        }
         U.y[backIndex] = problem.y[row];
+        Ut.y[backIndex] = problem.y[row];
         U.x[backIndex] = new svm_node[U.d + 1];
-        for(int column = 0; column <= S.d; column++) {
-            U.x[backIndex][column] = problem.x[backIndex][column];
+        Ut.x[backIndex] = new svm_node[Ut.d + 1];
+        for(int column = 0; column <= U.d; column++) {
+            U.x[backIndex][column] = problem.x[row][column];
+            Ut.x[backIndex][column] = problem.x[row][column];
         }
         backIndex++;
     }
     // Main loop
     svm_model *currentModel;
-    double bestScore = 0;
+    double bestScore = INFINITY;
     for(int itr = 0; itr < 10; itr++) {
-        std::cout << "<Itr " << itr << "> len(U) = " << U.l << " len(S) = " << S.l << "\n";
+        std::cout << "<Itr " << itr << "> len(U') = " << Ut.l << " len(S) = " << S.l << "\n";
         currentModel = svm_train(&S, params);
         SVMParameters modelParams = SVMParameters(currentModel, S, true);
-        double *pred = predict(currentModel, U);
-        double score = accuracyScore(U.l, pred, U.y);
-        std::cout << "Score: " << score << "\n";
+        double *predS = predict(currentModel, S), *predU = predict(currentModel, U), *predX = predict(currentModel, problem);
+        double scoreS = accuracyScore(S.l, predS, S.y), scoreU = accuracyScore(U.l, predU, U.y), scoreX = accuracyScore(problem.l, predX, problem.y);
+        std::cout << "Score(S): " << scoreS << " Score(U): " << scoreU << " Score(X): " << scoreX << "\n";
 
-        if(score > bestScore) {
-            bestScore = score;
+        if(abs(scoreS - scoreU) < bestScore) {
+            bestScore = abs(scoreS - scoreU);
             if(itr > 0) { svm_free_model_content(model); }
             model = currentModel;
+            if(bestScore < epsilon) {
+                std::cout << "(Break) abs(Score(S) - Score(U)) < epsilon\n";
+                delete [] predS;
+                delete [] predU;
+                break;
+            }
+        }
+        if(Ut.l == 0) {
+            std::cout << "(Break) U' is empty\n";
+            break;
         }
         std::unordered_set<int> SVIndices;
         // Get all SVs on U
-        for(int i = 0; i < U.l; i++) {
-            if(pred[i] != U.y[i]) {
+        for(int i = 0; i < Ut.l; i++) {
+            if(predU[i] != Ut.y[i]) {
                 SVIndices.insert(i);
-                S.append(U.x[i], U.y[i]);
+                S.append(Ut.x[i], Ut.y[i]);
                 //std::cout << "New SV: UX[" << i << "] h(x) != f(x):" << U.y[i] << "\n";
             } else {
-                double leftHand = modelParams.computeLeftHand(U.x[i], U.y[i]);
+                double leftHand = modelParams.computeLeftHand(Ut.x[i], Ut.y[i]);
                 //std::cout << "<LH> UX[" << i << "]: " << leftHand << "\n";
                 if (leftHand <= 1.0) {
                     SVIndices.insert(i);
-                    S.append(U.x[i], U.y[i]);
+                    S.append(Ut.x[i], Ut.y[i]);
                     //std::cout << "New SV: UX[" << i << "]" << leftHand << "\n";
                 }
             }
         }
-        if(SVIndices.empty()) { break; }
+        delete [] predS;
+        delete [] predU;
+        
+        if(SVIndices.empty()) {
+            std::cout << "(Break) No SV in U\n";
+            break;
+        }
         // Remove all SVs from U
-        for(int i = 0, backIndex = 0; i < U.l; i++) {
-            if(SVIndices.find(i) == SVIndices.end()) { // UX[i] is not a SV
-                U.x[backIndex] = U.x[i];
-                U.y[backIndex] = U.y[i];
-                backIndex++;
+        Ut.l -= SVIndices.size();
+        if(Ut.l > 0) {
+            for(int i = 0, backIndex = 0; i < Ut.l + SVIndices.size(); i++) {
+                if(SVIndices.find(i) == SVIndices.end()) { // UX[i] is not a SV
+                    Ut.x[backIndex] = Ut.x[i];
+                    Ut.y[backIndex] = Ut.y[i];
+                    backIndex++;
+                }
             }
         }
-        U.l -= SVIndices.size();
-        
-        delete [] pred;
-        if(U.l == 0) { break; }
-        //if(score < bestScore) { delete currentModel; }
     }
     // Separate U by the labels
 //    std::tuple<svm_node **, int, svm_node **, int> classes = separate_classes(problem);
