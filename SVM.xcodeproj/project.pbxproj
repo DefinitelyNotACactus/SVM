@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		631BFE8B28DF3222001F8E5C /* CBD.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 631BFE8928DF3222001F8E5C /* CBD.cpp */; };
+		631BFE8E28DF36F8001F8E5C /* kdtree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 631BFE8C28DF36F8001F8E5C /* kdtree.cpp */; };
+		631BFE9328DF6BB3001F8E5C /* AbstractSVM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 631BFE9128DF6BB3001F8E5C /* AbstractSVM.cpp */; };
 		638E68CC28D5F56A00A2B649 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 638E68CB28D5F56A00A2B649 /* main.cpp */; };
 		638E68D428D5F78C00A2B649 /* svm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 638E68D228D5F78C00A2B649 /* svm.cpp */; };
 		638E68D728D607F400A2B649 /* DatasetReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 638E68D528D607F400A2B649 /* DatasetReader.cpp */; };
@@ -28,6 +31,12 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		631BFE8928DF3222001F8E5C /* CBD.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CBD.cpp; sourceTree = "<group>"; };
+		631BFE8A28DF3222001F8E5C /* CBD.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CBD.hpp; sourceTree = "<group>"; };
+		631BFE8C28DF36F8001F8E5C /* kdtree.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = kdtree.cpp; sourceTree = "<group>"; };
+		631BFE8D28DF36F8001F8E5C /* kdtree.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = kdtree.hpp; sourceTree = "<group>"; };
+		631BFE9128DF6BB3001F8E5C /* AbstractSVM.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AbstractSVM.cpp; sourceTree = "<group>"; };
+		631BFE9228DF6BB3001F8E5C /* AbstractSVM.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = AbstractSVM.hpp; sourceTree = "<group>"; };
 		638E68C828D5F56A00A2B649 /* SVM */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SVM; sourceTree = BUILT_PRODUCTS_DIR; };
 		638E68CB28D5F56A00A2B649 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		638E68D228D5F78C00A2B649 /* svm.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = svm.cpp; sourceTree = "<group>"; };
@@ -40,7 +49,6 @@
 		638E68DC28D73E5C00A2B649 /* Util.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Util.hpp; sourceTree = "<group>"; };
 		63FE995E28D8EFF400956AB0 /* SVMBatch.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SVMBatch.cpp; sourceTree = "<group>"; };
 		63FE995F28D8EFF400956AB0 /* SVMBatch.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = SVMBatch.hpp; sourceTree = "<group>"; };
-		63FE996128D8F0E300956AB0 /* SVMBatch.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = SVMBatch.py; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -84,7 +92,12 @@
 				638E68DC28D73E5C00A2B649 /* Util.hpp */,
 				63FE995E28D8EFF400956AB0 /* SVMBatch.cpp */,
 				63FE995F28D8EFF400956AB0 /* SVMBatch.hpp */,
-				63FE996128D8F0E300956AB0 /* SVMBatch.py */,
+				631BFE8928DF3222001F8E5C /* CBD.cpp */,
+				631BFE8A28DF3222001F8E5C /* CBD.hpp */,
+				631BFE8C28DF36F8001F8E5C /* kdtree.cpp */,
+				631BFE8D28DF36F8001F8E5C /* kdtree.hpp */,
+				631BFE9128DF6BB3001F8E5C /* AbstractSVM.cpp */,
+				631BFE9228DF6BB3001F8E5C /* AbstractSVM.hpp */,
 			);
 			path = src;
 			sourceTree = "<group>";
@@ -148,10 +161,13 @@
 			files = (
 				638E68DA28D735F300A2B649 /* SVMParameters.cpp in Sources */,
 				638E68D428D5F78C00A2B649 /* svm.cpp in Sources */,
+				631BFE8E28DF36F8001F8E5C /* kdtree.cpp in Sources */,
 				638E68D728D607F400A2B649 /* DatasetReader.cpp in Sources */,
 				638E68CC28D5F56A00A2B649 /* main.cpp in Sources */,
+				631BFE9328DF6BB3001F8E5C /* AbstractSVM.cpp in Sources */,
 				638E68DD28D73E5C00A2B649 /* Util.cpp in Sources */,
 				63FE996028D8EFF400956AB0 /* SVMBatch.cpp in Sources */,
+				631BFE8B28DF3222001F8E5C /* CBD.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

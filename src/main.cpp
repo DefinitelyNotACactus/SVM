@@ -14,6 +14,7 @@
 #include "SVMParameters.hpp"
 #include "SVMBatch.hpp"
 #include "Util.hpp"
+#include "CBD.hpp"
 
 svm_problem problem;
 svm_parameter param;
@@ -62,21 +63,14 @@ int main(int argc, const char * argv[]) {
     std::cout << "nSV[0] = " << model->nSV[0] << " nSV[1] = " << model->nSV[1] << "\n";
     SVMBatch batchModel(&param, 0.1, 0.01);
     batchModel.fit(problem);
-    int wrongPredictionsBatch = 0, wrongPredictionsVanilla = 0;
-    for(int i = 0; i < problem.l; i++) {
-        double predictBatch = batchModel.predict(problem.x[i]), predictVanilla = batchModel.predict(model, problem.x[i]);
-        if(predictBatch != problem.y[i]) {
-//            std::cout << "X[" << i << "] h(X[i]) = " << predictBatch << " f(X[i]) = " << problem.y[i] << "\n";
-            wrongPredictionsBatch++;
-        }
-        if(predictVanilla != problem.y[i]) {
-            wrongPredictionsVanilla++;
-        }
-    }
+    CBD cbd(&param, 100, 0.25);
+    cbd.fit(problem);
     std::cout << "Vanilla:\n";
     classificationReport(problem.l, batchModel.predict(model, problem), problem.y);
     std::cout << "Batch:\n";
     classificationReport(problem.l, batchModel.predict(problem), problem.y);
+    std::cout << "CBD:\n";
+    classificationReport(problem.l, cbd.predict(problem), problem.y);
     
     return 0;
 }
