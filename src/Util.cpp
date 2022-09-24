@@ -92,8 +92,8 @@ double **confusionMatrix(const int size, const double *h, const double *y) {
 void classificationReport(const int size, const double *h, const double *y) {
     double **matrix = confusionMatrix(size, h, y);
     std::cout << "Class | Precision | Recall | F1-Score | Support\n";
-    std::cout << "Class 0 | " << matrix[0][0] / (matrix[0][0] + matrix[0][1]) << " | " << matrix[0][0] / (matrix[0][0] + matrix[1][0]) << " | N/A | " << matrix[0][0] + matrix[0][1] << "\n";
-    std::cout << "Class 1 | " << matrix[1][1] / (matrix[1][1] + matrix[1][0]) << " | " << matrix[1][1] / (matrix[1][1] + matrix[0][1]) << " | N/A | " << matrix[1][1] + matrix[1][0] << "\n";
+    std::cout << "Class 0 | " << matrix[0][0] / (matrix[0][0] + matrix[1][0]) << " | " << matrix[0][0] / (matrix[0][0] + matrix[0][1]) << " | N/A | " << matrix[0][0] + matrix[0][1] << "\n";
+    std::cout << "Class 1 | " << matrix[1][1] / (matrix[1][1] + matrix[0][1]) << " | " << matrix[1][1] / (matrix[1][1] + matrix[1][0]) << " | N/A | " << matrix[1][1] + matrix[1][0] << "\n";
     std::cout << "Accuracy: " << (matrix[0][0] + matrix[1][1]) / (double) size << "\n";
     // Free the confusion matrix
     for(int i = 0; i < 2; i++) {
