@@ -42,11 +42,8 @@ struct svm_problem
         if(l == maxl) {
             // TODO: Increase svm_problem size when l == maxl
         }
+        x[l] = xn;
         y[l] = yn;
-        x[l] = new svm_node[d + 1];
-        for(int i = 0; i <= d; i++) {
-            x[l][i] = xn[i];
-        }
         l++;
     }
 };

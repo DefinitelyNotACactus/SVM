@@ -13,6 +13,7 @@
 class SVMParameters {
 public:
     SVMParameters(const svm_model *, const svm_problem &, bool margin=false);
+    ~SVMParameters();
     
     double computeLeftHand(const svm_node *, double);
     void print();

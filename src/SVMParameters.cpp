@@ -14,17 +14,22 @@
 
 SVMParameters::SVMParameters(const svm_model *model, const svm_problem &problem, bool margin) : model(model), l(model->l), N(model->l), d(problem.d), X(new svm_node*[problem.l]), y(new double[problem.l]), alpha(new double[problem.l]), sumB(0), XSV0(new svm_node*[problem.l]), XSV1(new svm_node*[problem.l]) {
     for(int i = 0; i < problem.l; i++) {
+        X[i] = problem.x[i];
         y[i] = problem.y[i];
         alpha[i] = 0;
-        X[i] = new svm_node[d + 1];
-        for(int j = 0; j <= d; j++) {
-            X[i][j] = problem.x[i][j];
-        }
     }
     
     separateVS();
     computeB();
     if (margin) { computeMargin(); }
+}
+
+SVMParameters::~SVMParameters() {
+    delete [] X;
+    delete [] y;
+    delete [] XSV0;
+    delete [] XSV1;
+    delete [] alpha;
 }
 
 double SVMParameters::kernel(const svm_node *xm, const svm_node *xn) {
@@ -98,48 +103,25 @@ void SVMParameters::separateVS() {
                 continue;
             }
             if (model->sv_coef[0][i] < 0) {
-                XSV0[backIndexSV0] = new svm_node[d + 1];
-                for(int j = 0; j <= d; j++) {
-                    XSV0[backIndexSV0][j] = X[idSV][j];
-                }
-//                XSV0[backIndexSV0][d] = svm_node();
-//                XSV0[backIndexSV0] = X[idSV];
+                XSV0[backIndexSV0] = X[idSV];
                 backIndexSV0++;
             } else {
-                XSV1[backIndexSV1] = new svm_node[d + 1];
-                for(int j = 0; j <= d; j++) {
-                    XSV1[backIndexSV1][j] = X[idSV][j];
-                }
-//                XSV1[backIndexSV1][d] = svm_node();
-//                XSV1[backIndexSV1] = X[idSV];
+                XSV1[backIndexSV1] = X[idSV];
                 backIndexSV1++;
             }
         } else {
             svNoMargin.insert(idSV);
         }
     }
-    //svm_node **X = new svm_node*[N - svNoMargin.size()];
     int backIndex = 0;
-    //double *y = new double[N - svNoMargin.size()];
     for(int i = 0; i < N; i++) {
         if(svNoMargin.find(i) == svNoMargin.end()) {
-            //X[backIndex] = new svm_node[d + 1];
+            X[backIndex] = X[i];
             y[backIndex] = y[i];
-            for(int j = 0; j <= d; j++) {
-                X[backIndex][j] = X[i][j];
-            }
             backIndex++;
         }
     }
     
-//    for(int i = 0; i < N; i++) {
-//        delete [] this->X[i];
-//    }
-//    delete [] this->X;
-//    delete [] this->y;
-    
-//    this->X = X;
-//    this->y = y;
     N -= svNoMargin.size();
     lenSV0 = backIndexSV0;
     lenSV1 = backIndexSV1;
