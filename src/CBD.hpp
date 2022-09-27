@@ -32,7 +32,7 @@ public:
     
 private:
     const int K;
-    const double pctS;
+    const double G;
     
     CBDScore *determineScores(int, const svm_problem &);
     double computeDistance(const std::vector<double> &, const std::vector<double> &);

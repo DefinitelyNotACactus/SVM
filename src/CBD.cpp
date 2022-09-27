@@ -10,14 +10,16 @@
 
 #include <math.h>
 
-CBD::CBD(svm_parameter *params, int K, double pctS) : AbstractSVM(params), K(K), pctS(pctS) { };
+CBD::CBD(svm_parameter *params, int K, double G) : AbstractSVM(params), K(K), G(G) { };
 
 void CBD::fit(const svm_problem &problem) {
     CBDScore *scores = determineScores(K, problem);
     std::sort(scores, scores + problem.l, std::greater<CBDScore>());
-    svm_problem S((int) round((double) problem.l * pctS), 0, problem.d);
-    for(int i = 0; i < S.maxl; i++) {
+    svm_problem S(problem.l, 0, problem.d);
+    double cumSum = 0, sumS = scores[problem.l].score;
+    for(int i = 0; cumSum / sumS < G; i++) {
         S.append(problem.x[scores[i].index], problem.y[scores[i].index]);
+        cumSum += scores[i].score;
     }
     
     model = svm_train(&S, params);
@@ -27,7 +29,8 @@ void CBD::fit(const svm_problem &problem) {
 
 CBDScore * CBD::determineScores(int K, const svm_problem &problem) {
     if (K >= problem.l) K = problem.l - 1;
-    CBDScore *scores = new CBDScore[problem.l];
+    CBDScore *scores = new CBDScore[problem.l + 1];
+    scores[problem.l] = CBDScore(-1, 0);
     std::tuple<double **, int **> neighbors = computeNeighbors(K, problem);
     std::vector<double> t(problem.l, 0);
     double **distance = std::get<0>(neighbors), gamma = 0;
@@ -59,7 +62,10 @@ CBDScore * CBD::determineScores(int K, const svm_problem &problem) {
         }
     }
     for(int i = 0; i < problem.l; i++) {
-        if(contributions[i] > 0) { scores[i].score /= (double) contributions[i]; }
+        if(contributions[i] > 0) {
+            scores[i].score /= (double) contributions[i];
+            scores[problem.l].score += scores[i].score;
+        }
         delete [] distance[i];
         delete [] indices[i];
     }
