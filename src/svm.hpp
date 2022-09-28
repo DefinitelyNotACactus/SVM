@@ -29,15 +29,16 @@ struct svm_problem
     svm_problem(const svm_problem &problem) : svm_problem(problem.maxl, problem.l, problem.d) {
         for(int i = 0; i < l; i++) {
             y[i] = problem.y[i];
-            x[i] = new svm_node[d + 1];
-            for(int j = 0; j <= d; j++) {
-                x[i][j] = problem.x[i][j];
-            }
+            x[i] = problem.x[i];
         }
     }
     svm_problem(int l, int d) : maxl(l), l(l), d(d), y(new double[maxl]), x(new svm_node*[maxl]) { };
     svm_problem(int maxl, int l, int d) : maxl(maxl), l(l), d(d), y(new double[maxl]), x(new svm_node*[maxl]) { };
-
+//    ~svm_problem() {
+//        delete [] x;
+//        delete [] y;
+//    }
+    
     void append(svm_node *xn, double yn) {
         if(l == maxl) {
             // TODO: Increase svm_problem size when l == maxl

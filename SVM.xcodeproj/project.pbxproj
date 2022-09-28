@@ -47,6 +47,7 @@
 		638E68D928D735F300A2B649 /* SVMParameters.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = SVMParameters.hpp; sourceTree = "<group>"; };
 		638E68DB28D73E5C00A2B649 /* Util.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Util.cpp; sourceTree = "<group>"; };
 		638E68DC28D73E5C00A2B649 /* Util.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Util.hpp; sourceTree = "<group>"; };
+		63F9114A28E3142D0007B6D7 /* SVMBatchSamples.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = SVMBatchSamples.py; sourceTree = "<group>"; };
 		63FE995E28D8EFF400956AB0 /* SVMBatch.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SVMBatch.cpp; sourceTree = "<group>"; };
 		63FE995F28D8EFF400956AB0 /* SVMBatch.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = SVMBatch.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -98,6 +99,7 @@
 				631BFE8D28DF36F8001F8E5C /* kdtree.hpp */,
 				631BFE9128DF6BB3001F8E5C /* AbstractSVM.cpp */,
 				631BFE9228DF6BB3001F8E5C /* AbstractSVM.hpp */,
+				63F9114A28E3142D0007B6D7 /* SVMBatchSamples.py */,
 			);
 			path = src;
 			sourceTree = "<group>";

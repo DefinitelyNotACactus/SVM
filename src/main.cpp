@@ -63,7 +63,7 @@ int main(int argc, const char * argv[]) {
     std::cout << "nSV[0] = " << model->nSV[0] << " nSV[1] = " << model->nSV[1] << "\n";
     SVMBatch batchModel(&param, 0.1, 0.01);
     batchModel.fit(problem);
-    CBD cbd(&param, 100, 0.25);
+    CBD cbd(&param, 200, 0.8);
     cbd.fit(problem);
     std::cout << "Vanilla:\n";
     classificationReport(problem.l, batchModel.predict(model, problem), problem.y);

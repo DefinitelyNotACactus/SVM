@@ -9,8 +9,10 @@
 #define SVMBatch_hpp
 
 #include "AbstractSVM.hpp"
+#include "SVMParameters.hpp"
 
 #include <tuple>
+#include <unordered_set>
 
 class SVMBatch : public AbstractSVM {
 public:
@@ -21,6 +23,9 @@ public:
 private:
     double pct, epsilon;
     
-    std::tuple<svm_node **, int, svm_node **, int> separate_classes(svm_problem &);
+    std::tuple<svm_problem, svm_problem> separate_classes(const svm_problem &);
+    void removeSamples(const std::unordered_set<int> &, svm_problem &);
+    void getCandidates(std::unordered_set<int> &, std::unordered_set<int> &, std::unordered_set<int> &, const double *, SVMParameters &, const svm_problem &);
+    void selectCandidates(const std::unordered_set<int> &, std::unordered_set<int> &, const svm_problem &, svm_problem &);
 };
 #endif /* SVMBatch_hpp */

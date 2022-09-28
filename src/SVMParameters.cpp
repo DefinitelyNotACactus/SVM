@@ -94,6 +94,7 @@ void SVMParameters::separateVS() {
     for(int i = 0; i < N; i++) {
         double alpha_ = abs(model->sv_coef[0][i]);
         int idSV = model->sv_indices[i] - 1;
+        indicesSV.insert(idSV);
         alpha[idSV] = alpha_;
         if (alpha_ > 0 and alpha_ < model->param.C) {
             if(!svSelected) {
@@ -125,4 +126,8 @@ void SVMParameters::separateVS() {
     N -= svNoMargin.size();
     lenSV0 = backIndexSV0;
     lenSV1 = backIndexSV1;
+}
+
+bool SVMParameters::isSV(int index) {
+    return (indicesSV.find(index) != indicesSV.end());// UX[i] is not a SV
 }
